@@ -1,12 +1,14 @@
 /** module pattern - using IIFE and the power of closures
 // module - App Controller - appController
 var appController = (function() {
+  // add private variables and methods here
   var x = 23;
 
   var add = function(a) {
     return x + a;
   };
 
+  // add publicly available methods here
   return {
     publicAddFunc: function(b) {
       console.log(add(b));
@@ -17,7 +19,57 @@ var appController = (function() {
 
 // Data Controller
 var budgetController = (function() {
-  // TODO
+  var Expense = function(id, description, value) {
+    this.id = id;
+    this.description = description;
+    this.value = value;
+  };
+
+  var Income = function(id, description, value) {
+    this.id = id;
+    this.description = description;
+    this.value = value;
+  };
+
+  // data structure to hold all data
+  var data = {
+    allItems: {
+      exp: [],
+      inc: []
+    },
+    totals: {
+      exp: 0,
+      inc: 0
+    }
+  };
+
+  return {
+    addItem: function(type, desc, val) {
+      var newItem, ID;
+
+      // create new ID
+      if (data.allItems[type].length > 0) {
+        ID = data.allItems[type][data.allItems[type].length - 1].id + 1;
+      } else {
+        ID = 0;
+      }
+
+      // create new income/expense item
+      if (type === "exp") {
+        newItem = new Expense(ID, desc, val);
+      } else if (type === "inc") {
+        newItem = new Income(ID, desc, val);
+      }
+
+      // update data structure containing app data
+      data.allItems[type].push(newItem);
+      return newItem;
+    },
+
+    testing: function() {
+      console.log(data);
+    }
+  };
 })();
 
 // UI Controller
@@ -58,10 +110,13 @@ var appController = (function(budgetController, UIController) {
   };
 
   var ctrlAddItem = function() {
+    var input, newItem;
+
     // 1. Get input data
-    var input = UIController.getInput();
+    input = UIController.getInput();
 
     // 2. Add item to budget controller
+    newItem = budgetController.addItem(input.type, input.desc, input.value);
     // 3. Add item to UI
     // 4. Calculate budget
     // 5. Display budget on UI
